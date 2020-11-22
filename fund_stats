@@ -1,0 +1,90 @@
+# -*- coding:utf-8 -*-
+import pandas as pd 
+import math
+outpath = "/Users/xiefengchang/life/fund20201107.csv"
+# code,name,oneyearagonv, oneyearinc, twoyearagonv, twoyearinc, threeyearagonv, threeyearinc, fouryearagonv, fouryearinc
+def Average(lst): 
+    return sum(lst) / len(lst) 
+    
+def zhangfu(num1, num2):
+    return (num2-num1)/num1
+
+if __name__ == "__main__":
+    data = pd.read_csv(outpath)
+    cntPos = 0
+    cntNeg = 0
+
+    cntOneOver3Pos = 0
+    cntOneOver3Neg = 0
+    cntOneDec3Pos = 0
+    cntOneDec3Neg = 0
+    cntOneOver3FastPos =0
+    cntOneOver3FastNeg =0
+    oneYearIncreaseAvg4cntPos = []
+    oneYearOver3Increase = []
+    oneYearDec3Increase = []
+    oneYearOver3FastIncrease = []
+
+
+    for index, row in data.iterrows():
+        todayNv = row["当前净值"]
+        oneYearAgoNv = row["一年前净值"]
+        twoYearAgoNv = row["两年前净值"]
+        threeYearAgoNv = row["三年前净值"]
+        fourYearAgoNv = row["四年前净值"]
+
+        if ( math.isnan(oneYearAgoNv) or math.isnan(twoYearAgoNv) or math.isnan(threeYearAgoNv) or math.isnan(fourYearAgoNv)):
+            continue
+        print("{0},{1},{2},{3}".format(oneYearAgoNv, twoYearAgoNv, threeYearAgoNv, fourYearAgoNv)) 
+        if(oneYearAgoNv-fourYearAgoNv>0 and todayNv-oneYearAgoNv>0 ):
+            cntPos+=1
+            oneYearIncreaseAvg4cntPos.append((todayNv-oneYearAgoNv)/oneYearAgoNv)
+        elif(oneYearAgoNv-fourYearAgoNv>0 and todayNv-oneYearAgoNv<0):
+            cntNeg+=1
+
+        # 统计如果过去三年涨了，且过去一年涨幅比过去三年涨幅还要高的情况下， 未来一年涨的情况
+        if(oneYearAgoNv-fourYearAgoNv>0 and zhangfu(twoYearAgoNv, oneYearAgoNv)>zhangfu(fourYearAgoNv, oneYearAgoNv) and todayNv-oneYearAgoNv>0 ):
+            cntOneOver3Pos+=1
+            oneYearOver3Increase.append(zhangfu(oneYearAgoNv, todayNv))
+        elif(oneYearAgoNv-fourYearAgoNv>0 and zhangfu(twoYearAgoNv, oneYearAgoNv)>zhangfu(fourYearAgoNv, oneYearAgoNv) and todayNv-oneYearAgoNv<0):
+            cntOneOver3Neg+=1
+
+        #统计如果过去三年涨了，且过去一年涨幅不如过去三年涨幅的情况下， 未来一年涨的情况
+        if(oneYearAgoNv-twoYearAgoNv>0 and zhangfu(twoYearAgoNv, oneYearAgoNv)<zhangfu(fourYearAgoNv, oneYearAgoNv) and todayNv-oneYearAgoNv>0 ):
+            cntOneDec3Pos+=1
+            oneYearDec3Increase.append(zhangfu(oneYearAgoNv, todayNv))
+        elif(oneYearAgoNv-fourYearAgoNv>0 and zhangfu(twoYearAgoNv, oneYearAgoNv)<zhangfu(fourYearAgoNv, oneYearAgoNv) and todayNv-oneYearAgoNv<0):
+            cntOneDec3Neg+=1
+
+        #统计如果过去三年涨了，且过去一年涨幅不如过去三年涨幅,且最后一年涨幅超过20%的，未来一年涨的情况
+        if(oneYearAgoNv-twoYearAgoNv>0 and zhangfu(twoYearAgoNv, oneYearAgoNv)>zhangfu(fourYearAgoNv, oneYearAgoNv) and zhangfu(twoYearAgoNv, oneYearAgoNv)>0.2 and todayNv-oneYearAgoNv>0 ):
+            cntOneOver3FastPos+=1
+            oneYearOver3FastIncrease.append(zhangfu(oneYearAgoNv, todayNv))
+        elif(oneYearAgoNv-fourYearAgoNv>0 and zhangfu(twoYearAgoNv, oneYearAgoNv)>zhangfu(fourYearAgoNv, oneYearAgoNv) and zhangfu(twoYearAgoNv, oneYearAgoNv)>0.2 and todayNv-oneYearAgoNv<0):
+            cntOneOver3FastNeg+=1
+
+
+    # finish loop, statistics:
+    print("过去三年涨与未来一年涨的相关性：")        
+    print("Positive sample: {0}, negativce sample: {1}".format(cntPos, cntNeg))
+    print("该正向样本的平均增长率:")
+    print(Average(oneYearIncreaseAvg4cntPos))
+
+    print("========")
+    print("过去三年涨，且过去一年涨幅超过过去三年整体，预示着未来一年涨的相关性:")
+    print("该策略正向样本:{0},负样本:{1}".format(cntOneOver3Pos, cntOneOver3Neg))
+    print("该正向样本的平均增长率:")
+    print(Average(oneYearOver3Increase))
+
+
+    print("========")
+    print("过去三年涨，且过去一年涨幅不如过去三年整体，预示着未来一年涨的相关性:")
+    print("该策略正向样本:{0},负样本:{1}".format(cntOneDec3Pos, cntOneDec3Neg))
+    print("该正向样本的平均增长率:")
+    print(Average(oneYearDec3Increase))
+
+print("========")
+print("过去三年涨，且过去一年涨幅超过过去三年整体，且近一年涨幅超过20%的，预示着未来一年涨的相关性:")
+print("该策略正向样本:{0},负样本:{1}".format(cntOneOver3FastPos, cntOneOver3FastNeg))
+print("该正向样本的平均增长率:")
+print(Average(oneYearOver3FastIncrease))
