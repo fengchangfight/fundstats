@@ -77,7 +77,7 @@ def calcSellPrice(buyTotal, buyDatePrice, currentPrice):
 
 if __name__ == "__main__":
     excel_data_df = pd.read_excel(trade_file, sheet_name='Sheet1', encoding='utf8')
-    df = pd.DataFrame(excel_data_df, columns= [u'代码',u'名称',u'买入总价',u'买入日期',u'是否完结',u'止盈目标',u'止损目标'])
+    df = pd.DataFrame(excel_data_df, columns= [u'代码',u'名称',u'买入总价',u'买入日期',u'是否完结',u'止盈目标',u'止损目标',u'投资周期'])
 
     f = open(out_file, "w")
     f.write("更新日期：{0}\n".format(datetime.date.today()))
@@ -86,6 +86,7 @@ if __name__ == "__main__":
         name = row[u'名称']
         zhiying = row[u'止盈目标']
         zhisun = row[u'止损目标']
+        touzizhouqi = row[u'投资周期']
         if row[u'是否完结']==1:
             continue
         normalizedCurrentDate = normalizeDate(date.today())
@@ -104,8 +105,8 @@ if __name__ == "__main__":
             color='green'
         rowdata=(row_template.format(color, "基本信息: 代码:{0}, 名称:{1}, 买入日期:{2},买入总价:{3},当前日期:{4}， 买入价: {5}, 当前价: {6}, 涨跌幅:{7}".format(generateRealCodeFromIntCode(code), name.encode("utf8"), formatDate(buyDate), row[u'买入总价'] , formatDate(normalizedCurrentDate), priceOfBuyDate, priceOfCurrentDate, "{0:.1%}".format(changeRate)))+"\n")
         f.write(rowdata)
-        if(delta>=365):
-            printSellInfo(generateRealCodeFromIntCode(code),row[u'名称'],row[u'买入日期'], calcSellPrice(row[u'买入总价'], priceOfBuyDate, priceOfCurrentDate),"超过一年了，赶紧买！！！")
+        if(delta>=touzizhouqi):
+            printSellInfo(generateRealCodeFromIntCode(code),row[u'名称'],row[u'买入日期'], calcSellPrice(row[u'买入总价'], priceOfBuyDate, priceOfCurrentDate),"超过投资周期{0}天了，赶紧卖！！！".format(touzizhouqi))
             continue
 
         if((priceOfCurrentDate-priceOfBuyDate)/priceOfBuyDate>zhiying):
