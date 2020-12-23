@@ -77,7 +77,7 @@ def calcSellPrice(buyTotal, buyDatePrice, currentPrice):
 
 if __name__ == "__main__":
     excel_data_df = pd.read_excel(trade_file, sheet_name='Sheet1', encoding='utf8')
-    df = pd.DataFrame(excel_data_df, columns= [u'代码',u'名称',u'买入总价',u'买入日期',u'是否完结',u'止盈目标',u'止损目标',u'投资周期'])
+    df = pd.DataFrame(excel_data_df, columns= [u'代码',u'名称',u'买入总价',u'买入日期',u'是否完结',u'止盈目标',u'止损目标',u'投资周期',u'分红累加'])
 
     f = open(out_file, "w")
     f.write("更新日期：{0}\n".format(datetime.date.today()))
@@ -108,12 +108,13 @@ if __name__ == "__main__":
         if(delta>=touzizhouqi):
             printSellInfo(generateRealCodeFromIntCode(code),row[u'名称'],row[u'买入日期'], calcSellPrice(row[u'买入总价'], priceOfBuyDate, priceOfCurrentDate),"超过投资周期{0}天了，赶紧卖！！！".format(touzizhouqi))
             continue
-
-        if((priceOfCurrentDate-priceOfBuyDate)/priceOfBuyDate>zhiying):
+        fene = row[u'买入总价']*0.9995/priceOfBuyDate
+        ajusted_currentPrice = priceOfCurrentDate + row[u'分红累加']/fene
+        if((ajusted_currentPrice-priceOfBuyDate)/priceOfBuyDate>zhiying):
             printSellInfo(generateRealCodeFromIntCode(code),row[u'名称'],row[u'买入日期'], calcSellPrice(row[u'买入总价'], priceOfBuyDate, priceOfCurrentDate),"赚了超过{0}了，赶紧止盈!!!".format(str(zhiying)))
             continue
 
-        if((priceOfCurrentDate-priceOfBuyDate)/priceOfBuyDate<zhisun):
+        if((ajusted_currentPrice-priceOfBuyDate)/priceOfBuyDate<zhisun):
             printSellInfo(generateRealCodeFromIntCode(code),row[u'名称'],row[u'买入日期'], calcSellPrice(row[u'买入总价'], priceOfBuyDate, priceOfCurrentDate),"跌破{0}了，赶紧止损!!!".format(str(zhisun)))
 
     f.close()
