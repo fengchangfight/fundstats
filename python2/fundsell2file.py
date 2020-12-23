@@ -115,9 +115,9 @@ if __name__ == "__main__":
 
         row_template = "<p style=\"color:{0}\">{1}</p>"
         color = 'black'
-        if(priceOfCurrentDate > priceOfBuyDate):
+        if(dangqianzongjia > shijimairuzongjia):
             color = 'red'
-        elif(priceOfCurrentDate < priceOfBuyDate):
+        elif(dangqianzongjia < shijimairuzongjia):
             color = 'green'
         rowdata = (row_template.format(color, "基本信息: 代码:{0}, 名称:{1}, 买入日期:{2},买入总价:{3},当前日期:{4}， 买入价: {5}, 当前价: {6}, 涨跌幅:{7}".format(generateRealCodeFromIntCode(
             code), name.encode("utf8"), formatDate(buyDate), row[u'买入总价'], formatDate(normalizedCurrentDate), priceOfBuyDate, priceOfCurrentDate, "{0:.1%}".format(changeRate)))+"\n")
