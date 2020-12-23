@@ -106,7 +106,12 @@ if __name__ == "__main__":
         priceOfBuyDate = float(getDataOneDate4Code(
             generateRealCodeFromIntCode(code), normalizeDate(buyDate.date())))
 
-        changeRate = (priceOfCurrentDate-priceOfBuyDate)/priceOfBuyDate
+        shijimairuzongjia = row[u'买入总价']*0.9995
+        mairufene = shijimairuzongjia/priceOfBuyDate
+        zongfene = row[u'分红份额']+mairufene
+        dangqianzongjia = priceOfCurrentDate*zongfene+row[u'分红累加']
+
+        changeRate = (dangqianzongjia-shijimairuzongjia)/shijimairuzongjia
 
         row_template = "<p style=\"color:{0}\">{1}</p>"
         color = 'black'
@@ -117,11 +122,6 @@ if __name__ == "__main__":
         rowdata = (row_template.format(color, "基本信息: 代码:{0}, 名称:{1}, 买入日期:{2},买入总价:{3},当前日期:{4}， 买入价: {5}, 当前价: {6}, 涨跌幅:{7}".format(generateRealCodeFromIntCode(
             code), name.encode("utf8"), formatDate(buyDate), row[u'买入总价'], formatDate(normalizedCurrentDate), priceOfBuyDate, priceOfCurrentDate, "{0:.1%}".format(changeRate)))+"\n")
         f.write(rowdata)
-
-        shijimairuzongjia = row[u'买入总价']*0.9995
-        mairufene = shijimairuzongjia/priceOfBuyDate
-        zongfene = row[u'分红份额']+mairufene
-        dangqianzongjia = priceOfCurrentDate*zongfene+row[u'分红累加']
 
         if(delta >= touzizhouqi):
             printSellInfo(generateRealCodeFromIntCode(
