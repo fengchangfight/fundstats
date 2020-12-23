@@ -130,11 +130,11 @@ if __name__ == "__main__":
 
         if((dangqianzongjia-shijimairuzongjia)/shijimairuzongjia > zhiying):
             printSellInfo(generateRealCodeFromIntCode(
-                code), row[u'名称'], row[u'买入日期'], zongfene*priceOfCurrentDate, "赚了超过{0}了，赶紧止盈!!!".format(str(zhiying)))
+                code), row[u'名称'], row[u'买入日期'], zongfene*priceOfCurrentDate, "赚了超过{0}了，赶紧止盈!!!".format("{0:.1%}".format(zhiying)))
             continue
 
         if((dangqianzongjia-shijimairuzongjia)/shijimairuzongjia < zhisun):
             printSellInfo(generateRealCodeFromIntCode(
-                code), row[u'名称'], row[u'买入日期'], zongfene*priceOfCurrentDate, "跌破{0}了，赶紧止损!!!".format(str(zhisun)))
+                code), row[u'名称'], row[u'买入日期'], zongfene*priceOfCurrentDate, "跌破{0}了，赶紧止损!!!".format("{0:.1%}".format(zhisun)))
 
     f.close()
