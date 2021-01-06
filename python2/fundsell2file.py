@@ -77,9 +77,9 @@ def getDataOneDate4Code(code, dt):
     return netvalue
 
 
-def printSellInfo(codestr, name, buydate, price2sell, reason):
-    f.write("Sell this fund {0}({1}) for {2}, due to the reason {3}".format(
-        name.encode("utf8"), codestr, price2sell, reason)+"\n".encode("gbk"))
+def printSellInfo(codestr, name, buydate, zongfene,price, reason):
+    f.write("Sell this fund {0}({1}) in total {2}(fund share:{3}), due to the reason {4}".format(
+        name.encode("utf8"), codestr, zongfene*price, zongfene,reason)+"\n".encode("gbk"))
 
 
 if __name__ == "__main__":
@@ -125,16 +125,19 @@ if __name__ == "__main__":
 
         if(delta >= touzizhouqi):
             printSellInfo(generateRealCodeFromIntCode(
-                code), row[u'名称'], row[u'买入日期'], zongfene*priceOfCurrentDate, "超过投资周期{0}天了，赶紧卖！！！".format(touzizhouqi))
+                code), row[u'名称'], row[u'买入日期'], zongfene,priceOfCurrentDate, "超过投资周期{0}天了，赶紧卖！！！".format(touzizhouqi))
             continue
 
         if((dangqianzongjia-shijimairuzongjia)/shijimairuzongjia > zhiying):
             printSellInfo(generateRealCodeFromIntCode(
-                code), row[u'名称'], row[u'买入日期'], zongfene*priceOfCurrentDate, "赚了超过{0}了，赶紧止盈!!!".format("{0:.1%}".format(zhiying)))
+                code), row[u'名称'], row[u'买入日期'], zongfene,priceOfCurrentDate, "赚了超过{0}了，赶紧止盈!!!".format("{0:.1%}".format(zhiying)))
             continue
 
         if((dangqianzongjia-shijimairuzongjia)/shijimairuzongjia < zhisun):
             printSellInfo(generateRealCodeFromIntCode(
-                code), row[u'名称'], row[u'买入日期'], zongfene*priceOfCurrentDate, "跌破{0}了，赶紧止损!!!".format("{0:.1%}".format(zhisun)))
+                code), row[u'名称'], row[u'买入日期'], zongfene,priceOfCurrentDate, "跌破{0}了，赶紧止损!!!".format("{0:.1%}".format(zhisun)))
+
+        if((dangqianzongjia-shijimairuzongjia)/shijimairuzongjia > zhiying/2):
+            f.write("距离目标收益率{0}已过半，可考虑加仓".format("{0:.1%}".format(zhiying)))
 
     f.close()
